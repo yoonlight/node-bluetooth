@@ -1,0 +1,52 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <script src="https://cdn.jsdelivr.net/npm/@abandonware/noble@1.9.2-15/index.min.js"></script>
+    <title>Bluetooth</title>
+</head>
+<body>
+    <script>
+        var noble = require('noble');
+        noble.on('stateChange', function(state) {
+            if (state === 'poweredOn') {
+                noble.startScanning();
+            } else {
+                noble.stopScanning();
+            }
+        });
+
+        noble.on('discover', function(peripheral) {
+        console.log('peripheral discovered (' + peripheral.id +
+                    ' with address <' + peripheral.address +  ', ' + peripheral.addressType + '>,' +
+                    ' connectable ' + peripheral.connectable + ',' +
+                    ' RSSI ' + peripheral.rssi + ':');
+        console.log('\thello my local name is:');
+        console.log('\t\t' + peripheral.advertisement.localName);
+        console.log('\tcan I interest you in any of the following advertised services:');
+        console.log('\t\t' + JSON.stringify(peripheral.advertisement.serviceUuids));
+
+        var serviceData = peripheral.advertisement.serviceData;
+        if (serviceData && serviceData.length) {
+            console.log('\there is my service data:');
+            for (var i in serviceData) {
+            console.log('\t\t' + JSON.stringify(serviceData[i].uuid) + ': ' + JSON.stringify(serviceData[i].data.toString('hex')));
+            }
+        }
+        if (peripheral.advertisement.manufacturerData) {
+            console.log('\there is my manufacturer data:');
+            console.log('\t\t' + JSON.stringify(peripheral.advertisement.manufacturerData.toString('hex')));
+        }
+        if (peripheral.advertisement.txPowerLevel !== undefined) {
+            console.log('\tmy TX power level is:');
+            console.log('\t\t' + peripheral.advertisement.txPowerLevel);
+        }
+
+        console.log();
+        });
+
+
+    </script>
+</body>
+</html>
